@@ -15,7 +15,7 @@
         .card { padding: 25px; border-radius: 12px; border: 1px solid #e0e0e0; background: #fff; height: fit-content; }
         .achat-card { border-top: 6px solid var(--hb-blue); }
         .lld-card { border-top: 6px solid var(--gl-green); background-color: #f9fdfb; }
-        h2 { margin-top: 0; font-size: 1.3rem; color: #444; margin-bottom: 20px; text-transform: uppercase; }
+        h2 { margin-top: 0; font-size: 1.2rem; color: #444; margin-bottom: 20px; text-transform: uppercase; }
         label { display: block; margin: 12px 0 5px; font-weight: 600; font-size: 0.9rem; }
         input[type="number"], select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
         
@@ -27,6 +27,12 @@
         .highlight-eco { color: var(--gl-green); font-weight: bold; font-size: 1.2rem; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
         th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        
+        /* Section Bénéfices */
+        .benefits-list { margin-top: 20px; padding: 15px; background: #eef9f3; border-radius: 10px; border: 1px solid #d4edda; }
+        .benefit-item { display: flex; align-items: flex-start; margin-bottom: 10px; font-size: 0.85rem; color: #155724; }
+        .benefit-item span { margin-right: 8px; font-size: 1.1rem; }
+
         .banner-eco { margin-top: 20px; padding: 20px; background-color: #eef9f3; border: 2px dashed var(--gl-green); border-radius: 10px; text-align: center; }
         @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } .header-logos { grid-template-columns: 1fr; } }
     </style>
@@ -37,58 +43,56 @@
         <div class="logo-box"><img src="Logo HB_v3_Bleu.png" alt="Holland Bikes"></div>
         <div class="logo-box"><img src="GreenLeaze.jpg" alt="GreenLeaze"></div>
     </div>
+    
     <div class="grid">
         <div class="card achat-card">
-            <h2>Configuration Achat</h2>
+            <h2>Option Achat Classique</h2>
             <label>Prix du Vélo (€ TTC)</label>
             <input type="number" id="prixVelo" value="2699" oninput="calculer()">
-            
-            <label>Montant Accessoires (€ TTC)</label>
+            <label>Accessoires (€ TTC)</label>
             <input type="number" id="prixAcc" value="150" oninput="calculer()">
-            
-            <label>Type de Vélo (Entretien Achat)</label>
+            <label>Type d'entretien (Achat)</label>
             <select id="typeVelo" onchange="calculer()">
                 <option value="60">Musculaire (60€/an)</option>
                 <option value="75" selected>Électrique (75€/an)</option>
                 <option value="95">Cargo (95€/an)</option>
             </select>
-            
             <label>Durée de comparaison</label>
             <select id="duree" onchange="calculer()">
                 <option value="12">12 mois</option>
                 <option value="24" selected>24 mois</option>
                 <option value="36">36 mois</option>
             </select>
-
             <div class="result-box" id="resAchat"></div>
         </div>
 
         <div class="card lld-card">
-            <h2>Simulation LLD GreenLeaze</h2>
-            <label>Frais de service mensuels (Casse/Vol 0€ franchise)</label>
+            <h2>Avantages LLD GreenLeaze</h2>
+            
+            <label>Services mensuels (Cochez le type de vélo)</label>
             <div class="checkbox-group">
                 <label class="checkbox-item">
-                    <input type="checkbox" name="servLLD" value="6.5" onchange="calculer()"> Vélo Musculaire (6,50€/m)
+                    <input type="checkbox" name="servLLD" value="6.5" onchange="calculer()"> Musculaire (6,50€/m)
                 </label>
                 <label class="checkbox-item">
-                    <input type="checkbox" name="servLLD" value="8" onchange="calculer()"> Vélo Électrique (8,00€/m)
+                    <input type="checkbox" name="servLLD" value="8" onchange="calculer()"> Électrique (8,00€/m)
                 </label>
                 <label class="checkbox-item">
-                    <input type="checkbox" name="servLLD" value="10.5" onchange="calculer()"> Vélo Cargo (10,50€/m)
+                    <input type="checkbox" name="servLLD" value="10.5" onchange="calculer()"> Cargo (10,50€/m)
                 </label>
             </div>
-            
-            <p style="font-size:0.8rem; color:#666;">Note : Le loyer inclut le vélo et les accessoires.</p>
+
             <table>
-                <thead>
-                    <tr>
-                        <th>Loyers TCC</th>
-                        <th>Apport (Adhésion + J1)</th>
-                        <th>Coût Total LLD</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>Loyer/m</th><th>Apport</th><th>Coût Total LLD</th></tr></thead>
                 <tbody id="resLLD"></tbody>
             </table>
+
+            <div class="benefits-list">
+                <div class="benefit-item"><span>🛡️</span><strong>Zéro Franchise :</strong> En cas de vol ou casse, vous ne payez rien. L'assurance couvre 100% des frais.</div>
+                <div class="benefit-item"><span>🔄</span><strong>Liberté Totale :</strong> En fin de contrat, rendez votre vélo et repartez sur un modèle neuf dernier cri.</div>
+                <div class="benefit-item"><span>🛠️</span><strong>Sérénité :</strong> L'entretien et l'assistance sont déjà budgétisés dans votre loyer.</div>
+            </div>
+
             <div class="banner-eco" id="bilanEco"></div>
         </div>
     </div>
@@ -98,58 +102,43 @@
 function calculer() {
     const pVelo = parseFloat(document.getElementById('prixVelo').value) || 0;
     const pAcc = parseFloat(document.getElementById('prixAcc').value) || 0;
-    const pTotalMatériel = pVelo + pAcc;
+    const pTotalMatos = pVelo + pAcc;
     const entretienAn = parseFloat(document.getElementById('typeVelo').value);
     const dureeMois = parseInt(document.getElementById('duree').value);
     const dureeAns = dureeMois / 12;
 
-    // --- SERVICES LLD ---
     let serviceLLD = 0;
-    document.querySelectorAll('input[name="servLLD"]:checked').forEach((checkbox) => {
-        serviceLLD += parseFloat(checkbox.value);
-    });
+    document.querySelectorAll('input[name="servLLD"]:checked').forEach((cb) => serviceLLD += parseFloat(cb.value));
 
-    // --- CALCULS ACHAT ---
-    let assuranceAchat = pVelo * 0.075 * dureeAns;
-    if (dureeAns >= 2) assuranceAchat *= 0.8;
-    const totalAchat = pTotalMatériel + assuranceAchat + (entretienAn * dureeAns);
+    // ACHAT
+    let assurAchat = pVelo * 0.075 * dureeAns;
+    if (dureeAns >= 2) assurAchat *= 0.8;
+    const totalAchat = pTotalMatos + assurAchat + (entretienAn * dureeAns);
 
     document.getElementById('resAchat').innerHTML = `
-        Achat matériel : <b>${pTotalMatériel.toFixed(2)} €</b><br>
-        Assurance vol/casse : <b>${assuranceAchat.toFixed(2)} €</b><br>
-        Entretien magasin : <b>${(entretienAn * dureeAns).toFixed(2)} €</b><br>
-        <hr>Total sur la période : <b>${totalAchat.toFixed(2)} €</b>
+        Matériel : <b>${pTotalMatos.toFixed(2)} €</b><br>
+        Assurance Achat : <b>${assurAchat.toFixed(2)} €</b><br>
+        Entretien : <b>${(entretienAn*dureeAns).toFixed(2)} €</b><br>
+        <hr>Dépense Totale : <b>${totalAchat.toFixed(2)} €</b>
     `;
 
-    // --- CALCULS LLD ---
-    // Barème de référence GreenLeaze (2699€)
-    const mensualitesRef = { 12: 157, 24: 122, 36: 104 };
-    
-    // Application de la règle de calcul sur le TOTAL (Velo + Accessoires)
-    const mensuBaseTotale = (pTotalMatériel * mensualitesRef[dureeMois]) / 2699;
-    const mensuFinale = mensuBaseTotale + serviceLLD;
-    
-    const apportLLD = mensuFinale * 2; // Frais adhésion + 1er mois
-    const totalCoutLLD = (mensuFinale * dureeMois) + mensuFinale;
+    // LLD (Basé sur 2699€ ref)
+    const refs = { 12: 157, 24: 122, 36: 104 };
+    const mensuBase = (pTotalMatos * refs[dureeMois]) / 2699;
+    const mensuFinale = mensuBase + serviceLLD;
+    const apport = mensuFinale * 2;
+    const totalLLD = (mensuFinale * dureeMois) + mensuFinale;
 
     document.getElementById('resLLD').innerHTML = `
-        <tr>
-            <td><b>${mensuFinale.toFixed(2)} €/m</b></td>
-            <td>${apportLLD.toFixed(2)} €</td>
-            <td><b>${totalCoutLLD.toFixed(2)} €</b></td>
-        </tr>
+        <tr><td><b>${mensuFinale.toFixed(2)} €</b></td><td>${apport.toFixed(2)} €</td><td><b>${totalLLD.toFixed(2)} €</b></td></tr>
     `;
 
-    // --- COMPARATEUR ---
-    const diff = totalAchat - totalCoutLLD;
-    const tresorerieGagnee = pTotalMatériel - apportLLD;
-
+    const diff = totalAchat - totalLLD;
     document.getElementById('bilanEco').innerHTML = `
-        <span class="highlight-eco">Bénéfice client : ${diff.toFixed(2)} €</span><br>
-        <small>Trésorerie économisée à l'achat : <b>${tresorerieGagnee.toFixed(2)} €</b></small>
+        <span class="highlight-eco">Bénéfice Client : ${diff.toFixed(2)} €</span><br>
+        <small>Trésorerie préservée aujourd'hui : <b>${(pTotalMatos - apport).toFixed(2)} €</b></small>
     `;
 }
-
 calculer();
 </script>
 </body>
