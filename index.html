@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparateur Holland Bikes vs GreenLeaze</title>
+    <style>
+        :root { --hb-blue: #003366; --gl-green: #0a4d33; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .header-logos { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+        .logo-box { text-align: center; }
+        .logo-box img { max-height: 80px; max-width: 90%; object-fit: contain; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .card { padding: 25px; border-radius: 12px; border: 1px solid #e0e0e0; background: #fff; }
+        .achat-card { border-top: 6px solid var(--hb-blue); }
+        .lld-card { border-top: 6px solid var(--gl-green); background-color: #f9fdfb; }
+        h2 { margin-top: 0; font-size: 1.3rem; color: #444; margin-bottom: 20px; text-transform: uppercase; }
+        label { display: block; margin: 12px 0 5px; font-weight: 600; font-size: 0.9rem; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
+        .result-box { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #ccc; }
+        .highlight-eco { color: var(--gl-green); font-weight: bold; font-size: 1.2rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        .banner-eco { margin-top: 20px; padding: 20px; background-color: #eef9f3; border: 2px dashed var(--gl-green); border-radius: 10px; text-align: center; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } .header-logos { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header-logos">
+        <div class="logo-box"><img src="Logo HB_v3_Bleu.png" alt="Holland Bikes"></div>
+        <div class="logo-box"><img src="GreenLeaze.jpg" alt="GreenLeaze"></div>
+    </div>
+    <div class="grid">
+        <div class="card achat-card">
+            <h2>Simulation Achat</h2>
+            <label>Prix du Vélo (€ TTC)</label>
+            <input type="number" id="prixVelo" value="2699" oninput="calculer()">
+            <label>Accessoires (Casque, Antivol...)</label>
+            <input type="number" id="prixAcc" value="150" oninput="calculer()">
+            <label>Type de Vélo</label>
+            <select id="typeVelo" onchange="calculer()">
+                <option value="60">Musculaire (60€/an)</option>
+                <option value="75" selected>Électrique (75€/an)</option>
+                <option value="95">Cargo (95€/an)</option>
+            </select>
+            <label>Durée de comparaison</label>
+            <select id="duree" onchange="calculer()">
+                <option value="12">12 mois</option>
+                <option value="24" selected>24 mois</option>
+                <option value="36">36 mois</option>
+            </select>
+            <div class="result-box" id="resAchat"></div>
+        </div>
+        <div class="card lld-card">
+            <h2>Simulation LLD</h2>
+            <label>Frais de service (selon type)</label>
+            <select id="typeVeloLLD" onchange="calculer()">
+                <option value="6.5">Musculaire (6,50€/m)</option>
+                <option value="8" selected>Électrique (8,00€/m)</option>
+                <option value="10.5">Cargo (10,50€/m)</option>
+            </select>
+            <table>
+                <thead><tr><th>Mensuel</th><th>Apport</th><th>Coût Total</th></tr></thead>
+                <tbody id="resLLD"></tbody>
+            </table>
+            <div class="banner-eco" id="bilanEco"></div>
+        </div>
+    </div>
+</div>
+<script>
+function calculer() {
+    const pVelo = parseFloat(document.getElementById('prixVelo').value) || 0;
+    const pAcc = parseFloat(document.getElementById('prixAcc').value) || 0;
+    const pTotalMatos = pVelo + pAcc;
+    const entretienAn = parseFloat(document.getElementById('typeVelo').value);
+    const dureeMois = parseInt(document.getElementById('duree').value);
+    const dureeAns = dureeMois / 12;
+    const serviceLLD = parseFloat(document.getElementById('typeVeloLLD').value);
+    let assurance = pVelo * 0.075 * dureeAns;
+    if (dureeAns >= 2) assurance *= 0.8;
+    const totalAchat = pTotalMatos + assurance + (entretienAn * dureeAns);
+    document.getElementById('resAchat').innerHTML = `Achat : ${pTotalMatos.toFixed(2)}€<br>Assurance : ${assurance.toFixed(2)}€<br>Entretien : ${(entretienAn*dureeAns).toFixed(2)}€<br><hr>Total : <b>${totalAchat.toFixed(2)}€</b>`;
+    const refs = { 12: 157, 24: 122, 36: 104 };
+    const mensuFinale = ((pTotalMatos * refs[dureeMois]) / 2699) + serviceLLD;
+    const totalLLD = (mensuFinale * dureeMois) + mensuFinale;
+    document.getElementById('resLLD').innerHTML = `<tr><td><b>${mensuFinale.toFixed(2)}€</b></td><td>${(mensuFinale*2).toFixed(2)}€</td><td><b>${totalLLD.toFixed(2)}€</b></td></tr>`;
+    const diff = totalAchat - totalLLD;
+    document.getElementById('bilanEco').innerHTML = `<span class="highlight-eco">Économie : ${diff.toFixed(2)} €</span><br><small>Trésorerie préservée : ${(pTotalMatos - (mensuFinale*2)).toFixed(2)}€</small>`;
+}
+calculer();
+</script>
+</body>
+</html>
