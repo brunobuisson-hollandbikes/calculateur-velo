@@ -25,10 +25,11 @@
         
         .result-box { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #ccc; font-size: 0.95rem; }
         .highlight-eco { color: var(--gl-green); font-weight: bold; font-size: 1.2rem; }
+        .annual-cost { color: #555; font-style: italic; margin-top: 5px; display: block; }
+        
         table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
         th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
         
-        /* Section Bénéfices */
         .benefits-list { margin-top: 20px; padding: 15px; background: #eef9f3; border-radius: 10px; border: 1px solid #d4edda; }
         .benefit-item { display: flex; align-items: flex-start; margin-bottom: 10px; font-size: 0.85rem; color: #155724; }
         .benefit-item span { margin-right: 8px; font-size: 1.1rem; }
@@ -68,8 +69,7 @@
 
         <div class="card lld-card">
             <h2>Avantages LLD GreenLeaze</h2>
-            
-            <label>Services mensuels (Cochez le type de vélo)</label>
+            <label>Services mensuels (Garantie Casse/Vol)</label>
             <div class="checkbox-group">
                 <label class="checkbox-item">
                     <input type="checkbox" name="servLLD" value="6.5" onchange="calculer()"> Musculaire (6,50€/m)
@@ -83,14 +83,15 @@
             </div>
 
             <table>
-                <thead><tr><th>Loyer/m</th><th>Apport</th><th>Coût Total LLD</th></tr></thead>
+                <thead><tr><th>Loyer/m</th><th>Apport</th><th>Coût Total</th></tr></thead>
                 <tbody id="resLLD"></tbody>
             </table>
+            <div id="annualLLD" class="annual-cost" style="padding-left: 12px;"></div>
 
             <div class="benefits-list">
-                <div class="benefit-item"><span>🛡️</span><strong>Zéro Franchise :</strong> En cas de vol ou casse, vous ne payez rien. L'assurance couvre 100% des frais.</div>
-                <div class="benefit-item"><span>🔄</span><strong>Liberté Totale :</strong> En fin de contrat, rendez votre vélo et repartez sur un modèle neuf dernier cri.</div>
-                <div class="benefit-item"><span>🛠️</span><strong>Sérénité :</strong> L'entretien et l'assistance sont déjà budgétisés dans votre loyer.</div>
+                <div class="benefit-item"><span>🛡️</span><strong>Zéro Franchise :</strong> Assurance incluse sans aucun frais en cas de sinistre.</div>
+                <div class="benefit-item"><span>🔄</span><strong>Liberté :</strong> En fin de contrat, rendez votre vélo et choisissez-en un nouveau.</div>
+                <div class="benefit-item"><span>🛠️</span><strong>Sérénité :</strong> Entretien budgétisé et assistance inclus.</div>
             </div>
 
             <div class="banner-eco" id="bilanEco"></div>
@@ -110,33 +111,39 @@ function calculer() {
     let serviceLLD = 0;
     document.querySelectorAll('input[name="servLLD"]:checked').forEach((cb) => serviceLLD += parseFloat(cb.value));
 
-    // ACHAT
+    // CALCUL ACHAT
     let assurAchat = pVelo * 0.075 * dureeAns;
     if (dureeAns >= 2) assurAchat *= 0.8;
     const totalAchat = pTotalMatos + assurAchat + (entretienAn * dureeAns);
+    const achatParAn = totalAchat / dureeAns;
 
     document.getElementById('resAchat').innerHTML = `
-        Matériel : <b>${pTotalMatos.toFixed(2)} €</b><br>
-        Assurance Achat : <b>${assurAchat.toFixed(2)} €</b><br>
-        Entretien : <b>${(entretienAn*dureeAns).toFixed(2)} €</b><br>
-        <hr>Dépense Totale : <b>${totalAchat.toFixed(2)} €</b>
+        Investissement initial : <b>${pTotalMatos.toFixed(2)} €</b><br>
+        Assurance & Entretien : <b>${(assurAchat + (entretienAn*dureeAns)).toFixed(2)} €</b><br>
+        <hr>
+        Total sur la période : <b>${totalAchat.toFixed(2)} €</b><br>
+        <span class="annual-cost">Soit <b>${achatParAn.toFixed(2)} € / an</b></span>
     `;
 
-    // LLD (Basé sur 2699€ ref)
+    // CALCUL LLD
     const refs = { 12: 157, 24: 122, 36: 104 };
     const mensuBase = (pTotalMatos * refs[dureeMois]) / 2699;
     const mensuFinale = mensuBase + serviceLLD;
     const apport = mensuFinale * 2;
     const totalLLD = (mensuFinale * dureeMois) + mensuFinale;
+    const lldParAn = totalLLD / dureeAns;
 
     document.getElementById('resLLD').innerHTML = `
         <tr><td><b>${mensuFinale.toFixed(2)} €</b></td><td>${apport.toFixed(2)} €</td><td><b>${totalLLD.toFixed(2)} €</b></td></tr>
     `;
+    document.getElementById('annualLLD').innerHTML = `Soit <b>${lldParAn.toFixed(2)} € / an</b> (tout inclus)`;
 
+    // BILAN
     const diff = totalAchat - totalLLD;
+    const tresorerie = pTotalMatos - apport;
     document.getElementById('bilanEco').innerHTML = `
         <span class="highlight-eco">Bénéfice Client : ${diff.toFixed(2)} €</span><br>
-        <small>Trésorerie préservée aujourd'hui : <b>${(pTotalMatos - apport).toFixed(2)} €</b></small>
+        <small>Trésorerie préservée à l'achat : <b>${tresorerie.toFixed(2)} €</b></small>
     `;
 }
 calculer();
