@@ -69,6 +69,10 @@
 
         <div class="card lld-card">
             <h2>Avantages LLD GreenLeaze</h2>
+            
+            <label>Apport comptant souhaité (€ TTC)</label>
+            <input type="number" id="apportComptant" value="0" placeholder="Ex: 500" oninput="calculer()">
+
             <label>Services mensuels (Garantie Casse/Vol)</label>
             <div class="checkbox-group">
                 <label class="checkbox-item">
@@ -83,7 +87,7 @@
             </div>
 
             <table>
-                <thead><tr><th>Loyer/m</th><th>Apport</th><th>Coût Total</th></tr></thead>
+                <thead><tr><th>Loyer/m</th><th>Premier versement</th><th>Coût Total</th></tr></thead>
                 <tbody id="resLLD"></tbody>
             </table>
             <div id="annualLLD" class="annual-cost" style="padding-left: 12px;"></div>
@@ -107,6 +111,7 @@ function calculer() {
     const entretienAn = parseFloat(document.getElementById('typeVelo').value);
     const dureeMois = parseInt(document.getElementById('duree').value);
     const dureeAns = dureeMois / 12;
+    const apportComptant = parseFloat(document.getElementById('apportComptant').value) || 0;
 
     let serviceLLD = 0;
     document.querySelectorAll('input[name="servLLD"]:checked').forEach((cb) => serviceLLD += parseFloat(cb.value));
@@ -127,23 +132,27 @@ function calculer() {
 
     // CALCUL LLD
     const refs = { 12: 157, 24: 122, 36: 104 };
-    const mensuBase = (pTotalMatos * refs[dureeMois]) / 2699;
+    
+    // Le loyer est calculé sur (Total - Apport)
+    const montantFinancé = Math.max(0, pTotalMatos - apportComptant);
+    const mensuBase = (montantFinancé * refs[dureeMois]) / 2699;
     const mensuFinale = mensuBase + serviceLLD;
-    const apport = mensuFinale * 2;
-    const totalLLD = (mensuFinale * dureeMois) + mensuFinale;
+    
+    // Premier versement = Apport comptant + Frais adhésion + 1er loyer
+    const premierVersement = apportComptant + (mensuFinale * 2);
+    const totalLLD = (mensuFinale * dureeMois) + (mensuFinale) + apportComptant;
     const lldParAn = totalLLD / dureeAns;
 
     document.getElementById('resLLD').innerHTML = `
-        <tr><td><b>${mensuFinale.toFixed(2)} €</b></td><td>${apport.toFixed(2)} €</td><td><b>${totalLLD.toFixed(2)} €</b></td></tr>
+        <tr><td><b>${mensuFinale.toFixed(2)} €</b></td><td>${premierVersement.toFixed(2)} €</td><td><b>${totalLLD.toFixed(2)} €</b></td></tr>
     `;
     document.getElementById('annualLLD').innerHTML = `Soit <b>${lldParAn.toFixed(2)} € / an</b> (tout inclus)`;
 
     // BILAN
     const diff = totalAchat - totalLLD;
-    const tresorerie = pTotalMatos - apport;
     document.getElementById('bilanEco').innerHTML = `
         <span class="highlight-eco">Bénéfice Client : ${diff.toFixed(2)} €</span><br>
-        <small>Trésorerie préservée à l'achat : <b>${tresorerie.toFixed(2)} €</b></small>
+        <small>Trésorerie économisée à l'achat : <b>${(pTotalMatos - premierVersement).toFixed(2)} €</b></small>
     `;
 }
 calculer();
