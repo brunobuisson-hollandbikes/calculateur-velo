@@ -26,8 +26,6 @@
         th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
         
         .upway-box { margin-top: 15px; padding: 12px; background: #fffbe6; border: 1px solid #ffe58f; border-radius: 8px; font-size: 0.85rem; }
-        .upway-logo { font-weight: bold; color: #ff8c00; }
-        
         .benefits-list { margin-top: 20px; padding: 15px; background: #eef9f3; border-radius: 10px; border: 1px solid #d4edda; }
         .benefit-item { display: flex; align-items: flex-start; margin-bottom: 10px; font-size: 0.85rem; color: #155724; }
         .benefit-item span { margin-right: 8px; font-size: 1.1rem; }
@@ -60,11 +58,10 @@
             <div class="result-box" id="resAchat"></div>
 
             <div class="upway-box">
-                <div class="upway-logo">📊 Estimation Reprise Professionnelle (Type Upway)</div>
-                <div id="resaleDetails" style="margin-top:8px;"></div>
-                <p style="font-size: 0.75rem; color: #856404; margin-top: 10px;">
-                    *Basé sur les cotes de rachat immédiat. Vendre à un particulier est plus lent et risqué (batterie, moteur sans garantie).
-                </p>
+                <div style="font-weight:bold; color:#ff8c00;">📊 Estimation Reprise & Entretien</div>
+                <div id="entretientDetails" style="margin-top:8px; font-size:0.8rem;"></div>
+                <hr style="border:0; border-top:1px solid #ffe58f; margin:8px 0;">
+                <div id="resaleDetails" style="font-size:0.85rem;"></div>
             </div>
         </div>
 
@@ -75,7 +72,6 @@
 
             <label>Option Garantie & Service</label>
             <select id="serviceSelect" onchange="calculer()" style="width: 100%; padding: 12px; border-radius: 6px;">
-                <option value="0">Aucun service</option>
                 <option value="6.5">Musculaire (6,50€/m)</option>
                 <option value="8" selected>Électrique (8,00€/m)</option>
                 <option value="10.5">Cargo (10,50€/m)</option>
@@ -89,7 +85,7 @@
             <div class="benefits-list">
                 <div class="benefit-item"><span>🛡️</span><strong>Zéro Franchise :</strong> Aucune mauvaise surprise en cas de vol ou casse.</div>
                 <div class="benefit-item"><span>🔄</span><strong>Liberté Totale :</strong> Rendez le vélo en fin de contrat, repartez sur un modèle neuf.</div>
-                <div class="benefit-item"><span>📉</span><strong>Zéro Risque de décote :</strong> La perte de valeur est pour nous, pas pour vous.</div>
+                <div class="benefit-item"><span>📉</span><strong>Zéro Entretien à payer :</strong> Les révisions et l'usure sont pour nous.</div>
             </div>
 
             <div class="banner-eco" id="bilanEco"></div>
@@ -107,14 +103,17 @@ function calculer() {
     const apportComptant = parseFloat(document.getElementById('apportComptant').value) || 0;
     const serviceLLD = parseFloat(document.getElementById('serviceSelect').value);
 
-    // --- ACHAT ---
-    // Assurance Achat (estimée) + Entretien (75€/an)
+    // --- LOGIQUE ACHAT ---
+    const revisionAnnuelle = 75; // Prix fixe révision
+    const consommablesMoyens = 75; // Usure moyenne (plaquettes, chaîne, pneus)
+    const entretienTotal = (revisionAnnuelle + consommablesMoyens) * dureeAns;
+    
     let assurAchat = pVelo * 0.075 * dureeAns;
     if (dureeAns >= 2) assurAchat *= 0.8;
-    const totalAchat = pTotalMatos + assurAchat + (75 * dureeAns);
+    
+    const totalAchat = pTotalMatos + assurAchat + entretienTotal;
 
-    // VALEURS DE REPRISE UPWAY (Moyennes constatées pour rachat pro)
-    // 1 an : ~65% | 2 ans : ~50% | 3 ans : ~34%
+    // REPRISE UPWAY : 1an: 65% | 2ans: 50% | 3ans: 34%
     const ratiosUpway = { 1: 0.65, 2: 0.50, 3: 0.34 };
     const valeurReprise = pVelo * ratiosUpway[dureeAns];
     const coutReelAchat = totalAchat - valeurReprise;
@@ -125,12 +124,16 @@ function calculer() {
         Coût de possession net : <b>${coutReelAchat.toFixed(2)} €</b>
     `;
 
-    document.getElementById('resaleDetails').innerHTML = `
-        Valeur de reprise estimée : <b style="color:#d44;">${valeurReprise.toFixed(2)} €</b><br>
-        Dépote (Perte de valeur) : <b>${(pTotalMatos - valeurReprise).toFixed(2)} €</b>
+    document.getElementById('entretientDetails').innerHTML = `
+        Révisions (1/an) : ${ (revisionAnnuelle * dureeAns).toFixed(2) } €<br>
+        Consommables VAE (est.) : ${ (consommablesMoyens * dureeAns).toFixed(2) } €
     `;
 
-    // --- LLD ---
+    document.getElementById('resaleDetails').innerHTML = `
+        Reprise pro Upway (${ratiosUpway[dureeAns]*100}%) : <b style="color:#d44;">${valeurReprise.toFixed(2)} €</b>
+    `;
+
+    // --- LOGIQUE LLD ---
     const refs = { 12: 157, 24: 122, 36: 104 };
     const montantFinancé = Math.max(0, pTotalMatos - apportComptant);
     const mensuBase = (montantFinancé * refs[dureeMois]) / 2699;
