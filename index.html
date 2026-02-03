@@ -19,18 +19,15 @@
         label { display: block; margin: 12px 0 5px; font-weight: 600; font-size: 0.9rem; }
         input[type="number"], select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
         
-        .checkbox-group { background: #fff; border: 1px solid #ddd; padding: 10px; border-radius: 6px; margin-bottom: 15px; }
-        .checkbox-item { display: flex; align-items: center; margin-bottom: 8px; cursor: pointer; font-size: 0.9rem; }
-        .checkbox-item input { margin-right: 10px; width: 18px; height: 18px; cursor: pointer; }
-        
         .result-box { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #ccc; font-size: 0.95rem; }
         .highlight-eco { color: var(--gl-green); font-weight: bold; font-size: 1.2rem; }
-        .annual-cost { color: #555; font-style: italic; margin-top: 5px; display: block; }
         
         table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
         th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
         
-        .resale-warning { margin-top: 15px; padding: 10px; background: #fff3cd; border: 1px solid #ffeeba; border-radius: 6px; font-size: 0.8rem; color: #856404; }
+        .upway-box { margin-top: 15px; padding: 12px; background: #fffbe6; border: 1px solid #ffe58f; border-radius: 8px; font-size: 0.85rem; }
+        .upway-logo { font-weight: bold; color: #ff8c00; }
+        
         .benefits-list { margin-top: 20px; padding: 15px; background: #eef9f3; border-radius: 10px; border: 1px solid #d4edda; }
         .benefit-item { display: flex; align-items: flex-start; margin-bottom: 10px; font-size: 0.85rem; color: #155724; }
         .benefit-item span { margin-right: 8px; font-size: 1.1rem; }
@@ -48,55 +45,51 @@
     
     <div class="grid">
         <div class="card achat-card">
-            <h2>Achat Comptant</h2>
+            <h2>Simulation Achat</h2>
             <label>Prix du Vélo (€ TTC)</label>
             <input type="number" id="prixVelo" value="2699" oninput="calculer()">
             <label>Accessoires (€ TTC)</label>
             <input type="number" id="prixAcc" value="150" oninput="calculer()">
-            <label>Entretien annuel</label>
-            <select id="typeVelo" onchange="calculer()">
-                <option value="60">Musculaire (60€/an)</option>
-                <option value="75" selected>Électrique (75€/an)</option>
-                <option value="95">Cargo (95€/an)</option>
-            </select>
-            <label>Durée de détention</label>
+            <label>Durée de possession</label>
             <select id="duree" onchange="calculer()">
-                <option value="12">12 mois (1 an)</option>
-                <option value="24" selected>24 mois (2 ans)</option>
-                <option value="36">36 mois (3 ans)</option>
+                <option value="12">1 an</option>
+                <option value="24" selected>2 ans</option>
+                <option value="36">3 ans</option>
             </select>
 
             <div class="result-box" id="resAchat"></div>
 
-            <div id="resaleBox" style="margin-top:15px; font-size:0.9rem;">
-                </div>
-            <div class="resale-warning">
-                ⚠️ <strong>Attention :</strong> Revendre un vélo électrique d'occasion est complexe (usure batterie, électronique). Les reprises professionnelles sont souvent bien inférieures aux prix particuliers.
+            <div class="upway-box">
+                <div class="upway-logo">📊 Estimation Reprise Professionnelle (Type Upway)</div>
+                <div id="resaleDetails" style="margin-top:8px;"></div>
+                <p style="font-size: 0.75rem; color: #856404; margin-top: 10px;">
+                    *Basé sur les cotes de rachat immédiat. Vendre à un particulier est plus lent et risqué (batterie, moteur sans garantie).
+                </p>
             </div>
         </div>
 
         <div class="card lld-card">
-            <h2>Solution GreenLeaze</h2>
+            <h2>Simulation LLD</h2>
             <label>Apport comptant (€ TTC)</label>
             <input type="number" id="apportComptant" value="0" oninput="calculer()">
 
-            <label>Garantie & Service (Cochez le type)</label>
-            <div class="checkbox-group">
-                <label class="checkbox-item"><input type="checkbox" name="servLLD" value="6.5" onchange="calculer()"> Musculaire (6,50€/m)</label>
-                <label class="checkbox-item"><input type="checkbox" name="servLLD" value="8" onchange="calculer()"> Électrique (8,00€/m)</label>
-                <label class="checkbox-item"><input type="checkbox" name="servLLD" value="10.5" onchange="calculer()"> Cargo (10,50€/m)</label>
-            </div>
+            <label>Option Garantie & Service</label>
+            <select id="serviceSelect" onchange="calculer()" style="width: 100%; padding: 12px; border-radius: 6px;">
+                <option value="0">Aucun service</option>
+                <option value="6.5">Musculaire (6,50€/m)</option>
+                <option value="8" selected>Électrique (8,00€/m)</option>
+                <option value="10.5">Cargo (10,50€/m)</option>
+            </select>
 
             <table>
                 <thead><tr><th>Loyer/m</th><th>1er Versement</th><th>Coût Total</th></tr></thead>
                 <tbody id="resLLD"></tbody>
             </table>
-            <div id="annualLLD" class="annual-cost" style="padding-left: 12px;"></div>
 
             <div class="benefits-list">
-                <div class="benefit-item"><span>🛡️</span><strong>Zéro Franchise :</strong> Assurance Casse/Vol complète sans frais cachés.</div>
-                <div class="benefit-item"><span>🔄</span><strong>Zéro Aléa :</strong> Pas de revente à gérer, vous changez de vélo simplement en fin de contrat.</div>
-                <div class="benefit-item"><span>🛠️</span><strong>Sérénité :</strong> Entretien et assistance inclus dans votre budget mensuel.</div>
+                <div class="benefit-item"><span>🛡️</span><strong>Zéro Franchise :</strong> Aucune mauvaise surprise en cas de vol ou casse.</div>
+                <div class="benefit-item"><span>🔄</span><strong>Liberté Totale :</strong> Rendez le vélo en fin de contrat, repartez sur un modèle neuf.</div>
+                <div class="benefit-item"><span>📉</span><strong>Zéro Risque de décote :</strong> La perte de valeur est pour nous, pas pour vous.</div>
             </div>
 
             <div class="banner-eco" id="bilanEco"></div>
@@ -109,57 +102,54 @@ function calculer() {
     const pVelo = parseFloat(document.getElementById('prixVelo').value) || 0;
     const pAcc = parseFloat(document.getElementById('prixAcc').value) || 0;
     const pTotalMatos = pVelo + pAcc;
-    const entretienAn = parseFloat(document.getElementById('typeVelo').value);
     const dureeMois = parseInt(document.getElementById('duree').value);
     const dureeAns = dureeMois / 12;
     const apportComptant = parseFloat(document.getElementById('apportComptant').value) || 0;
+    const serviceLLD = parseFloat(document.getElementById('serviceSelect').value);
 
-    let serviceLLD = 0;
-    document.querySelectorAll('input[name="servLLD"]:checked').forEach((cb) => serviceLLD += parseFloat(cb.value));
-
-    // --- CALCUL ACHAT ---
+    // --- ACHAT ---
+    // Assurance Achat (estimée) + Entretien (75€/an)
     let assurAchat = pVelo * 0.075 * dureeAns;
     if (dureeAns >= 2) assurAchat *= 0.8;
-    const totalAchat = pTotalMatos + assurAchat + (entretienAn * dureeAns);
-    
-    // Valeur résiduelle
-    const ratiosResiduelle = { 1: 0.70, 2: 0.55, 3: 0.45 };
-    const valeurResiduelle = pVelo * ratiosResiduelle[dureeAns];
-    const coutReelAchat = totalAchat - valeurResiduelle;
+    const totalAchat = pTotalMatos + assurAchat + (75 * dureeAns);
+
+    // VALEURS DE REPRISE UPWAY (Moyennes constatées pour rachat pro)
+    // 1 an : ~65% | 2 ans : ~50% | 3 ans : ~34%
+    const ratiosUpway = { 1: 0.65, 2: 0.50, 3: 0.34 };
+    const valeurReprise = pVelo * ratiosUpway[dureeAns];
+    const coutReelAchat = totalAchat - valeurReprise;
 
     document.getElementById('resAchat').innerHTML = `
-        Dépense cumulée : <b>${totalAchat.toFixed(2)} €</b><br>
-        Coût annuel moy. : <b>${(totalAchat/dureeAns).toFixed(2)} €/an</b>
+        Dépense totale cumulée : <b>${totalAchat.toFixed(2)} €</b><br>
+        <hr>
+        Coût de possession net : <b>${coutReelAchat.toFixed(2)} €</b>
     `;
 
-    document.getElementById('resaleBox').innerHTML = `
-        <table style="margin-top:0; border:1px solid #eee;">
-            <tr style="background:#f0f4f8;"><td>Revente espérée (${ratiosResiduelle[dureeAns]*100}%)</td><td style="text-align:right;"><b>- ${valeurResiduelle.toFixed(2)} €</b></td></tr>
-            <tr><td><b>Coût de possession net</b></td><td style="text-align:right;"><b>${coutReelAchat.toFixed(2)} €</b></td></tr>
-        </table>
+    document.getElementById('resaleDetails').innerHTML = `
+        Valeur de reprise estimée : <b style="color:#d44;">${valeurReprise.toFixed(2)} €</b><br>
+        Dépote (Perte de valeur) : <b>${(pTotalMatos - valeurReprise).toFixed(2)} €</b>
     `;
 
-    // --- CALCUL LLD ---
+    // --- LLD ---
     const refs = { 12: 157, 24: 122, 36: 104 };
     const montantFinancé = Math.max(0, pTotalMatos - apportComptant);
     const mensuBase = (montantFinancé * refs[dureeMois]) / 2699;
     const mensuFinale = mensuBase + serviceLLD;
+    
     const premierVersement = apportComptant + (mensuFinale * 2);
     const totalLLD = (mensuFinale * dureeMois) + (mensuFinale) + apportComptant;
 
     document.getElementById('resLLD').innerHTML = `
         <tr><td><b>${mensuFinale.toFixed(2)} €</b></td><td>${premierVersement.toFixed(2)} €</td><td><b>${totalLLD.toFixed(2)} €</b></td></tr>
     `;
-    document.getElementById('annualLLD').innerHTML = `Soit <b>${(totalLLD/dureeAns).toFixed(2)} € / an</b> (tout inclus)`;
 
     // --- BILAN ---
-    // On compare le coût net (Achat - Revente) vs LLD
     const diff = coutReelAchat - totalLLD;
     const tresorerie = pTotalMatos - premierVersement;
     
     document.getElementById('bilanEco').innerHTML = `
         <span class="highlight-eco">Bénéfice Net LLD : ${diff.toFixed(2)} €</span><br>
-        <small>Trésorerie préservée : <b>${tresorerie.toFixed(2)} €</b></small>
+        <small>Trésorerie préservée aujourd'hui : <b>${tresorerie.toFixed(2)} €</b></small>
     `;
 }
 calculer();
